@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 14:17:43 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/28 16:38:00 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/10/29 16:18:44 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/08 18:01:32 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/17 11:31:05 by asilveir         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
+#define BUFFER_SIZE 5
 
 size_t	ft_strlen(char const *string)
 {
@@ -84,43 +72,95 @@ char	*ft_strjoin(char const *str1, char const *str2)
 	concat_string[i] = '\0';
 	return (concat_string);
 }
-
-char *copy_until_break(char *s)
+int	look_for_break(char *buffer)
 {
-	char	*string;
 	int	i;
 
 	i = 0;
-	string = malloc(ft_strlen(s));
-	if (!string)
+	if (buffer[i] == '\n')
 	{
-		return (NULL);
-	}
-	while(s[i] && s[i] != '\n')
-	{
-		string[i] = s[i];
+		return (1);
 		i++;
 	}
-	return (string);
+	return (0);
+}
+char *copy_until_break(char *s)
+{
+	char	*string_result;
+	int	i;
+	
+	i = 0;
+	string_result = malloc(ft_strlen(s) + 2);
+	if (!string_result)
+		return (NULL);
+	while(s[i] && s[i] != '\n')
+	{
+		string_result[i] = s[i];
+		i++;
+	}
+	//printf("%s\n", string_result);
+	i = 0;
+	if (s[i] == '\n')
+		s[i++] = '\n';
+	// printf("%s\n", string_result);
+	// string_result[i] = '\0';
+	return (string_result);
+}
+
+char *get_next_line(int fd)
+{
+	char	buffer[BUFFER_SIZE + 1];
+	int	i;
+	int	j;
+	char	*stash;
+	char	*line;
+	char	*ptr_to_break;
+	char	*buffer_word;
+	char	**buffer_array;
+	int	line_break_index;
+
+	line = NULL;
+	i = 0;
+	j = 0;
+	line_break_index = 0;
+	buffer_word = malloc(100);
+	buffer_array = malloc(100);
+	stash = malloc(1000);
+	line = malloc(1000);
+	while (read(fd,buffer, BUFFER_SIZE) && !ft_strchr(buffer,'\n'))
+	{
+		if (ft_strchr(buffer, '\n'))
+		{
+			while (buffer[line_break_index] != '\n')
+				line_break_index++;
+			printf("%d", line_break_index);
+			while (buffer[line_break_index])
+			{
+				printf("%c", buffer[line_break_index]);
+				line_break_index++;
+			}
+			printf(" - iteration ok\n");
+			while(buffer[line_break_index])
+			{
+				stash[i] = buffer[line_break_index];
+				line_break_index++;
+			}
+			// printf("%s-", buffer);
+		}
+		//printf("%s -- ", buffer);
+		stash = ft_strjoin(stash, buffer);
+		line = copy_until_break(stash);
+	}
+	printf("%s\n", line);
+	stash = "";
+	// printf("%s\n", stash);
 }
 
 int	main()
 {
 	int	fd;
-	char	buffer[100];
-	int	i;
-	char	*stash;
-	char	*line;
 
-	i = 0;
-	stash = malloc(100);
-	line = malloc(1000);
 	fd = open("teste.txt", O_RDONLY);
-	while (read(3,buffer,5) && !ft_strchr(stash, '\n'))
-	{
-		stash = ft_strjoin(stash, buffer);
-		i++;
-	}
-	line = copy_until_break(stash);
-	printf("%s", line);
+	get_next_line(fd);
+	get_next_line(fd);
 }
