@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 14:17:43 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/29 16:18:44 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/10/29 20:34:17 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <fcntl.h>
 
 #define BUFFER_SIZE 5
+
+static char *words_to_add = "";
+static int	times_function_was_called;
 
 size_t	ft_strlen(char const *string)
 {
@@ -72,95 +75,102 @@ char	*ft_strjoin(char const *str1, char const *str2)
 	concat_string[i] = '\0';
 	return (concat_string);
 }
-int	look_for_break(char *buffer)
-{
-	int	i;
-
-	i = 0;
-	if (buffer[i] == '\n')
-	{
-		return (1);
-		i++;
-	}
-	return (0);
-}
-char *copy_until_break(char *s)
+char *copy_until_break(char *stash, char *buffer)
 {
 	char	*string_result;
+	char	*string_formatted;
 	int	i;
+	int	j;
 	
 	i = 0;
-	string_result = malloc(ft_strlen(s) + 2);
+	j = 0;
+	string_result = malloc(1000);
 	if (!string_result)
 		return (NULL);
-	while(s[i] && s[i] != '\n')
+	while((stash[i]) && (stash[i] != '\n'))
 	{
-		string_result[i] = s[i];
+		string_result[i] = stash[i];
 		i++;
 	}
-	//printf("%s\n", string_result);
+	string_result[i] = '\0';
+	if(!buffer)
+		return (string_result);
+	else 
+		return (ft_strjoin(buffer, string_result));
+}
+
+char *string_to_add(char *s)
+{
+	char *string;
+	size_t	i;
+	size_t	j;
+	
 	i = 0;
-	if (s[i] == '\n')
-		s[i++] = '\n';
-	// printf("%s\n", string_result);
-	// string_result[i] = '\0';
-	return (string_result);
+	j = 0;
+	string = malloc(50);
+	while (s[i] != '\n')
+		i++;
+	while(s[i])
+	{
+		string[j] = s[i];
+		i++;
+		j++;
+	}
+	string[i] = '\0';
+	return (string);
 }
 
 char *get_next_line(int fd)
 {
-	char	buffer[BUFFER_SIZE + 1];
-	int	i;
-	int	j;
+	char	buffer[BUFFER_SIZE];
 	char	*stash;
 	char	*line;
-	char	*ptr_to_break;
-	char	*buffer_word;
-	char	**buffer_array;
-	int	line_break_index;
 
-	line = NULL;
-	i = 0;
-	j = 0;
-	line_break_index = 0;
-	buffer_word = malloc(100);
-	buffer_array = malloc(100);
-	stash = malloc(1000);
-	line = malloc(1000);
-	while (read(fd,buffer, BUFFER_SIZE) && !ft_strchr(buffer,'\n'))
+
+	stash = malloc(100);
+	line = malloc(100);
+	printf("%d\n", times_function_was_called);
+	while (read(fd, buffer, BUFFER_SIZE))
 	{
-		if (ft_strchr(buffer, '\n'))
+		stash = ft_strjoin(stash,buffer);
+		if (ft_strchr(buffer,'\n'))
 		{
-			while (buffer[line_break_index] != '\n')
-				line_break_index++;
-			printf("%d", line_break_index);
-			while (buffer[line_break_index])
+			if (times_function_was_called == 0)
 			{
-				printf("%c", buffer[line_break_index]);
-				line_break_index++;
+				words_to_add = "";
 			}
-			printf(" - iteration ok\n");
-			while(buffer[line_break_index])
+			if (times_function_was_called >= 1)
 			{
-				stash[i] = buffer[line_break_index];
-				line_break_index++;
+				line = copy_until_break(stash, words_to_add);
 			}
-			// printf("%s-", buffer);
+			line = copy_until_break(stash, words_to_add);
+			if (times_function_was_called == 0)
+			{
+				words_to_add = string_to_add(buffer);
+			}
+			times_function_was_called++;
+			words_to_add = string_to_add(buffer);
+			printf("%s\n", line);
+			return (line);
 		}
-		//printf("%s -- ", buffer);
-		stash = ft_strjoin(stash, buffer);
-		line = copy_until_break(stash);
 	}
-	printf("%s\n", line);
-	stash = "";
-	// printf("%s\n", stash);
+	return ("0");
 }
 
 int	main()
 {
 	int	fd;
+	
 
 	fd = open("teste.txt", O_RDONLY);
 	get_next_line(fd);
 	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+
 }
