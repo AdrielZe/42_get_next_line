@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:42 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/30 19:01:49 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/10/31 16:43:02 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,6 @@ char	*copy_until_break(char *stash, char *buffer)
 	int		i;
 	int		j;
 	char	*string_result;
-	char	*string_formatted;
 
 	i = 0;
 	j = 0;
@@ -122,6 +121,8 @@ char	*string_to_add(char *s)
 	size_t	i;
 	size_t	j;
 
+	if (!s)
+		return (NULL);
 	i = 0;
 	j = 0;
 	string = malloc(50);
