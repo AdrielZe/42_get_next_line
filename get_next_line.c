@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 14:17:43 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/31 17:05:00 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/01 15:50:27 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "get_next_line.h"
-// #define BUFFER_SIZE 5
+#define BUFFER_SIZE 6
 
 char	*word_to_add(const char *new_word)
 {
@@ -35,29 +35,24 @@ char	*word_to_add(const char *new_word)
 
 int	times_function_was_called(void)
 {
-	static int	counter = -1;
-
-	return (++counter);
+	static int counter = 0;
+	
+	return (counter++);
 }
 
 char	*process_line(char *stash, char *word_to_insert, int times_function_was_executed)
 {
 	char *line;
 
-	if (times_function_was_executed == 0)
+	if (times_function_was_executed <= 0)
 	{
 		line = "";
 		word_to_insert = "";
 	}
 	else if (times_function_was_executed >= 1)
-	{
 		line = copy_until_break(stash, word_to_insert);
-	}
 	else
-	{
 		line = copy_until_break(stash, word_to_insert);
-	}
-
 	return (line);
 }
 char	*handle_new_line(char **stash, char **word_to_insert , char *buffer, int times_function_was_executed)
@@ -72,6 +67,26 @@ char	*handle_new_line(char **stash, char **word_to_insert , char *buffer, int ti
 	free (*stash);
 	return (line);
 }
+char	*copy_until_break(char *stash, char *buffer)
+{
+	int		i;
+	int		j;
+	char	*string_result;
+
+	i = 0;
+	j = 0;
+	while ((stash[i]) && (stash[i] != '\n'))
+	{
+		i++;
+	}
+	string_result = malloc(i + 1);
+	ft_strlcpy(string_result, stash, i + 1);
+	string_result[i] = '\0';
+	if (!buffer)
+		return (string_result);
+	else
+		return (ft_strjoin(buffer, string_result));
+}
 
 char	*get_next_line(int fd)
 {
@@ -80,27 +95,37 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*word_to_insert;
 	int			times_function_was_executed;
+	int bytes_read;
 
-	line = malloc(1);
-	if (!line)
-		return (NULL);
-	if (times_function_was_called() == 0)
+	stash = "";
+	if (times_function_was_called() <= 0)
 		word_to_insert = word_to_add(NULL);
 	else
 		word_to_insert = word_to_add(word_to_insert);
 	times_function_was_executed = times_function_was_called();
-	while (read(fd, buffer, BUFFER_SIZE))
+	while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
+
+		buffer[bytes_read] = '\0';
 		stash = ft_strjoin(stash, buffer);
 		if (!stash)
 			return (NULL);
+
 		if (ft_strchr(buffer, '\n'))
 		{
-			line = handle_new_line(&stash, &word_to_insert , buffer, times_function_was_executed);
+			line = handle_new_line(&stash, &word_to_insert,
+					buffer, times_function_was_executed);
 			if (!line)
 				return (NULL);
 			return (line);
 		}
+	}
+	if (bytes_read == 0 && stash && *stash)
+	{
+		line = ft_strdup(stash);
+		free (stash);
+		stash = NULL;
+		return line;
 	}
 	return (NULL);
 }
@@ -117,5 +142,11 @@ int	main()
 	printf("%s\n",get_next_line(fd));
 	printf("%s\n",get_next_line(fd));
 	printf("%s\n",get_next_line(fd));
-
+	printf("%s\n",get_next_line(fd));
+	printf("%s\n",get_next_line(fd));
+	printf("%s\n",get_next_line(fd));
+	printf("%s\n",get_next_line(fd));
+	printf("%s\n",get_next_line(fd));
+	printf("%s\n",get_next_line(fd));
+		printf("%s\n",get_next_line(fd));
 }

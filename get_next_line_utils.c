@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:42 by asilveir          #+#    #+#             */
-/*   Updated: 2024/10/31 16:43:02 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/01 15:36:59 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,28 +91,7 @@ size_t	ft_strlcpy(char *dest, char const *src, size_t size)
 }
 
 // Retorna a string presente na linha até o '\n', removendo a parte do buffer que não vamos usar
-char	*copy_until_break(char *stash, char *buffer)
-{
-	int		i;
-	int		j;
-	char	*string_result;
 
-	i = 0;
-	j = 0;
-	string_result = malloc(1000);
-	if (!string_result)
-		return (NULL);
-	while ((stash[i]) && (stash[i] != '\n'))
-	{
-		string_result[i] = stash[i];
-		i++;
-	}
-	string_result[i] = '\0';
-	if (!buffer)
-		return (string_result);
-	else
-		return (ft_strjoin(buffer, string_result));
-}
 
 // Verifica a string a ser adicionada ao início da próxima linha (retorna os carácteres presentes após '\n' na string)
 char	*string_to_add(char *s)
@@ -136,4 +115,22 @@ char	*string_to_add(char *s)
 	}
 	string[i] = '\0';
 	return (string);
+}
+
+char	*ft_strdup(char const *str)
+{
+	char	*str_space;
+	int		i;
+
+	i = 0;
+	str_space = (char *)malloc((ft_strlen(str) + 1) * sizeof(char));
+	if (str_space == NULL)
+		return (NULL);
+	while (str[i])
+	{
+		str_space[i] = str[i];
+		i++;
+	}
+	str_space[i] = '\0';
+	return (str_space);
 }
