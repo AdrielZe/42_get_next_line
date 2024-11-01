@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:42 by asilveir          #+#    #+#             */
-/*   Updated: 2024/11/01 15:36:59 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/01 18:36:48 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include "get_next_line.h"
-// Usado para retornar o tamanho da string e mallocar o valor
+
 size_t	ft_strlen(char const *string)
 {
 	size_t	i;
@@ -27,7 +27,7 @@ size_t	ft_strlen(char const *string)
 	}
 	return (i);
 }
-//Usada para encontrar a ocorrência do primeiro '\n' presente na linha atual ( se houver )
+
 char	*ft_strchr(char const *s, int c)
 {
 	unsigned char	ch;
@@ -43,7 +43,7 @@ char	*ft_strchr(char const *s, int c)
 		return ((char *)s);
 	return (NULL);
 }
-//Concatena duas strings. Usado para concatenar o valor do buffer na string 'stash', que vai acumular os caracteres pelos quais o buffer passa
+
 char	*ft_strjoin(char const *str1, char const *str2)
 {
 	char	*concat_string;
@@ -88,33 +88,6 @@ size_t	ft_strlcpy(char *dest, char const *src, size_t size)
 	}
 	dest[i] = '\0';
 	return (ft_strlen(src));
-}
-
-// Retorna a string presente na linha até o '\n', removendo a parte do buffer que não vamos usar
-
-
-// Verifica a string a ser adicionada ao início da próxima linha (retorna os carácteres presentes após '\n' na string)
-char	*string_to_add(char *s)
-{
-	char	*string;
-	size_t	i;
-	size_t	j;
-
-	if (!s)
-		return (NULL);
-	i = 0;
-	j = 0;
-	string = malloc(50);
-	while (s[i] != '\n')
-		i++;
-	while (s[i])
-	{
-		string[j] = s[i];
-		i++;
-		j++;
-	}
-	string[i] = '\0';
-	return (string);
 }
 
 char	*ft_strdup(char const *str)
