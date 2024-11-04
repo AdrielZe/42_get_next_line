@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:42 by asilveir          #+#    #+#             */
-/*   Updated: 2024/11/01 18:36:48 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/04 16:46:53 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,14 @@ char	*ft_strchr(char const *s, int c)
 char	*ft_strjoin(char const *str1, char const *str2)
 {
 	char	*concat_string;
-	int		size_to_alloc;
-	int		i;
-	int		j;
+	size_t		size_to_alloc;
+	size_t		i;
+	size_t		j;
 
-	size_to_alloc = (ft_strlen(str1) + ft_strlen(str2));
+	size_to_alloc = (ft_strlen(str1) + ft_strlen(str2) + 1);
 	i = 0;
-	j = 0;
-	concat_string = (char *)malloc ((size_to_alloc + 1) * sizeof(char));
+	j = 0; 
+	concat_string = malloc((size_to_alloc));
 	if (!concat_string)
 		return (NULL);
 	while (str1[i])
@@ -63,11 +63,7 @@ char	*ft_strjoin(char const *str1, char const *str2)
 		i++;
 	}
 	while (str2[j])
-	{
-		concat_string[i] = str2[j];
-		i++;
-		j++;
-	}
+		concat_string[i++] = str2[j++];
 	concat_string[i] = '\0';
 	return (concat_string);
 }
