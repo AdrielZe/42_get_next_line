@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 14:17:43 by asilveir          #+#    #+#             */
-/*   Updated: 2024/11/04 19:56:31 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/05 17:04:51 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,122 +15,111 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "get_next_line.h"
-#define BUFFER_SIZE 1
+// #define BUFFER_SIZE 5
 
-int	times_function_was_called(void)
-{
-	static int counter = 0;
-	
-	return (counter++);
-}
+// gcc -g -o p get_next_line.c get_next_line_utils.c
 
-char *process_and_handle_new_line(char **stash, char **word_to_insert, char *buffer)
+// valgrind --leak-check=full ./p
+
+// Pega a linha atual até o \n ou até o nulo
+//ok
+char *get_current_line(char *stash)
 {
-	char	*line;
+	int	i;
+	char	*string;
 	
-	// if (!stash || !buffer)
-	// 	return (NULL);
-	line = copy_until_break(*stash, *word_to_insert);
-	if (!line)
+	i = 0;
+	if (!stash[i])
 		return (NULL);
-	free (*stash);
-	stash = NULL;
-	return (line);
+	while(stash[i] && stash[i] != '\n')
+		i++;
+	string = ft_substr(stash, 0, i + ft_endl(stash));
+	if (!string)
+	{
+		free (string);
+		return (NULL);
+	}
+	return (string);
 }
-//copia o conteudo da string ate o \n e concatena com o buffer atual
-char	*copy_until_break(char *stash, char *buffer)
+// Lê o arquivo e retorna o stash concatenado com o buffer atual
+char	*read_fd(int fd, char *stash)
 {
-	int		i;
-	int		j;
-	char	*string_result;
-	char	*result;
+	char	*string;
+	int	bytes_read;
+
+	string = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!string)
+		return (NULL);
+	bytes_read = 1;
+	while (!ft_strchr(stash, '\n') && bytes_read != 0)
+	{
+		bytes_read = read(fd, string, BUFFER_SIZE);
+		if (bytes_read < 0)
+		{
+			free(string);
+			return (NULL);
+		}
+		string[bytes_read] = '\0';
+		stash = ft_strjoin(stash, string);
+	}
+	free (string);
+	return (stash);
+}
+// String para ser adicionada no inicio do proximo buffer - pega o conteudo depois do '\n'
+char	*string_to_add(char *stash)
+{
+	char *string;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
-	while ((stash[i]) && (stash[i] != '\n'))
+	while (stash[i] && stash[i] != '\n')
 		i++;
-	string_result = malloc(i + 1);
-	if (!string_result)
+	if (!stash[i])
+	{
+		free(stash);
 		return (NULL);
-	ft_strlcpy(string_result, stash, i + 1);
-	if (!buffer)
-		return (string_result);
-	result = ft_strjoin(buffer, string_result);
-	free(string_result);
-	return result;
-}
-// String para ser adicionada no inicio do proximo buffer - pega o conteudo depois do '\n'
-char	*string_to_add(char *s)
-{
-   char *string;
-    size_t i = 0;
-    size_t j = 0;
-
-    while (s[i] && s[i] != '\n')
-        i++;
-    if (!s[i] || ft_strlen(s + i) == 0)
-        return NULL;
-    string = malloc(ft_strlen(s + i) + 1);
-    if (!string)
-        return NULL;
-    while (s[++i])
-        string[j++] = s[i];
-    string[j] = '\0';
-    return string;
+	}
+	string = malloc(sizeof(char) * (ft_strlen(stash) - i + 1));
+	if (!string)
+		return NULL;
+	i++;
+	while (stash[i])
+		string[j++] = stash[i++];
+	string[j] = '\0';
+	free (stash);
+	return (string);
 }
 
 char	*get_next_line(int fd)
 {
-	char		buffer[BUFFER_SIZE + 1];
-	char		*stash;
-	char		*line;
-	char *temp; 
-	static char		*word_to_insert;	
-	int 	bytes_read;
+	char	*line;
+	static	char	*stash;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (times_function_was_called() <= 0)
-		word_to_insert = NULL;
-	stash = malloc(1);
+	stash = read_fd(fd, stash);
 	if (!stash)
 		return (NULL);
-	*stash = '\0'; 
-	while ((bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0)
-	{
-		buffer[bytes_read] = '\0';
-		temp = stash;
-		stash = ft_strjoin(stash, buffer);
-		free(temp);
-		if (ft_strchr(buffer, '\n'))
-		{
-			line = process_and_handle_new_line(&stash, &word_to_insert, buffer);
-			free(word_to_insert);
-			word_to_insert = string_to_add(buffer);
-			return (line);
-		}
-	}
-	if (bytes_read == 0 && stash && *stash)
-	{	line = ft_strdup(stash);
-		if (!line)
-			return NULL;
-		free (stash);
-		return line;
-	}
-	free (stash);
-	return (NULL);
+	line = get_current_line(stash);
+	stash = string_to_add(stash);
+	return (line);
 }
 
-int	main()
-{
-	int	fd;
-	fd = open("teste.txt", O_RDONLY);
-	printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-	// printf("%s\n",get_next_line(fd));
-}
+// int	main()
+// {
+// 	int	fd;
+// 	char	*line;
+
+// 	fd = open("teste.txt", O_RDONLY);
+// 	while(1)
+// 	{
+// 		line = get_next_line(fd);
+// 		if (!line)
+// 			break;
+// 		printf("%s", line);
+// 		free(line);
+// 	}
+// 	return (0);
+// }

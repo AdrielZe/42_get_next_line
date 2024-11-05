@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:01 by asilveir          #+#    #+#             */
-/*   Updated: 2024/11/04 13:52:57 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:14:18 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@
 #include <stddef.h>
 
 char	*ft_strchr(char const *s, int c);
-char	*ft_strjoin(char const *str1, char const *str2);
+char	*ft_strjoin(char *str1, char *str2);
 size_t	ft_strlcpy(char *dest, char const *src, size_t size);
-char	*ft_strdup(char const *str);
 size_t	ft_strlen(char const *string);
 char	*get_next_line(int fd);
-char	*copy_until_break(char *stash, char *buffer);
+int	ft_endl(char	*buffer);
 char	*string_to_add(char *s);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
 
 #endif
