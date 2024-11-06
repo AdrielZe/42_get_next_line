@@ -6,7 +6,7 @@
 /*   By: asilveir <asilveir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 17:54:42 by asilveir          #+#    #+#             */
-/*   Updated: 2024/11/05 16:22:49 by asilveir         ###   ########.fr       */
+/*   Updated: 2024/11/06 12:26:20 by asilveir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,7 @@ char	*ft_strchr(char const *s, int c)
 
 char	*ft_strjoin(char *str1, char *str2)
 {
-	char	*concat_string;
-	size_t		size_to_alloc;
+	char		*concat_string;
 	size_t		i;
 	size_t		j;
 
@@ -58,12 +57,11 @@ char	*ft_strjoin(char *str1, char *str2)
 		str1 = malloc(sizeof(char));
 		str1[0] = '\0';
 	}
-	size_to_alloc = ((ft_strlen(str1) + ft_strlen(str2)) + 1);
-	concat_string = malloc((size_to_alloc));
+	concat_string = malloc((ft_strlen(str1) + ft_strlen(str2)) + 1);
 	if (!concat_string)
 		return (NULL);
 	i = 0;
-	j = 0; 
+	j = 0;
 	while (str1[i])
 	{
 		concat_string[i] = str1[i];
@@ -75,41 +73,24 @@ char	*ft_strjoin(char *str1, char *str2)
 	free(str1);
 	return (concat_string);
 }
-size_t	check_len(size_t len, size_t strlen, unsigned int start)
-{
-	if (len > strlen - start)
-	{
-		len = strlen - start;
-		return (len);
-	}
-	return (len);
-}
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
-{	
-	char	*substr;
+{
+	char	*new_str;
 	size_t	i;
+	size_t	j;
 
-	i = 0;
+	new_str = malloc(len + 1);
+	if (!new_str)
+		return (NULL);
 	if (!s)
 		return (NULL);
-	if (start >= ft_strlen(s))
-	{
-		substr = (char *)malloc((1) * sizeof(char));
-		substr[0] = '\0';
-		return (substr);
-	}
-	len = check_len(len, ft_strlen(s), start);
-	substr = (char *)malloc((len + 1) * sizeof(char));
-	if (!substr)
-		return (NULL);
-	while (i < len)
-	{
-		substr[i] = s[start + i];
-		i++;
-	}
-	substr[i] = '\0';
-	return (substr);
+	i = start;
+	j = 0;
+	while (i < ft_strlen(s) && j < len)
+		new_str[j++] = s[i++];
+	new_str[j] = '\0';
+	return (new_str);
 }
 
 int	ft_endl(char	*buffer)
@@ -117,7 +98,7 @@ int	ft_endl(char	*buffer)
 	size_t	i;
 
 	i = 0;
-	while(buffer[i] != '\n' && buffer[i] != '\0')
+	while (buffer[i] != '\n' && buffer[i] != '\0')
 		i++;
 	if (buffer[i] == '\n')
 		return (1);
